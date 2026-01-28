@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: darkweb_guard
+      POSTGRES_USER: darkweb
+      POSTGRES_PASSWORD: darkweb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  backend:
+    build: ../backend
+    env_file:
+      - ../backend/.env.example
+    environment:
+      DATABASE_URL: postgresql+psycopg2://darkweb:darkweb@postgres:5432/darkweb_guard
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+  worker:
+    build: ../backend
+    env_file:
+      - ../backend/.env.example
+    environment:
+      DATABASE_URL: postgresql+psycopg2://darkweb:darkweb@postgres:5432/darkweb_guard
+      REDIS_URL: redis://redis:6379/0
+    command: ["celery", "-A", "app.workers.celery_app.celery_app", "worker", "-B", "--loglevel=info"]
+    depends_on:
+      - backend
+      - redis
+  frontend:
+    build: ../frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+      VITE_DEMO_MODE: "false"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
