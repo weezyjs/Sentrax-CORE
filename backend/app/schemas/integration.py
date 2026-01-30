@@ -1,5 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from app.schemas.common import BaseSchema
+
+VALID_INTEGRATION_TYPES = {"jira", "o365", "trellix", "webhook"}
 
 
 class IntegrationCreate(BaseModel):
@@ -7,6 +9,12 @@ class IntegrationCreate(BaseModel):
     integration_type: str
     config: dict | None = None
     secrets: dict | None = None
+
+    @validator("integration_type")
+    def validate_integration_type(cls, v):
+        if v not in VALID_INTEGRATION_TYPES:
+            raise ValueError(f"Invalid integration type. Must be one of: {', '.join(sorted(VALID_INTEGRATION_TYPES))}")
+        return v
 
 
 class IntegrationUpdate(BaseModel):

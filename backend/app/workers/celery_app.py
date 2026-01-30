@@ -11,5 +11,9 @@ celery_app.conf.beat_schedule = {
     "run-connectors": {
         "task": "app.workers.tasks.run_connectors",
         "schedule": 60 * 60 * 6,
-    }
+    },
+    "run-alerts": {
+        "task": "app.workers.tasks.run_alerts",
+        "schedule": 60 * 60 * 6,
+    },
 }

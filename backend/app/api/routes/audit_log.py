@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.api.deps import require_role
@@ -16,5 +16,10 @@ def list_audit_log(
 ):
     if user.role == "SUPER_ADMIN" and not x_org_id:
         return db.query(AuditLog).filter(AuditLog.scope == "platform").order_by(AuditLog.created_at.desc()).all()
-    org_id = x_org_id or user.org_id
+    if user.role != "SUPER_ADMIN":
+        if x_org_id and x_org_id != user.org_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Org mismatch")
+        org_id = user.org_id
+    else:
+        org_id = x_org_id
     return db.query(AuditLog).filter(AuditLog.org_id == org_id).order_by(AuditLog.created_at.desc()).all()

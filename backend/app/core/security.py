@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict
 import jwt
 from passlib.context import CryptContext
@@ -16,7 +16,7 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def create_access_token(subject: Dict[str, Any], expires_delta: int | None = None) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=expires_delta or settings.access_token_expire_minutes)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=expires_delta or settings.access_token_expire_minutes)
     payload = {"exp": expire, **subject}
     return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
