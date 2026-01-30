@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     twilio_account_sid: str | None = Field(default=None, env="TWILIO_ACCOUNT_SID")
     twilio_auth_token: str | None = Field(default=None, env="TWILIO_AUTH_TOKEN")
     twilio_from_number: str | None = Field(default=None, env="TWILIO_FROM_NUMBER")
-    allowed_origins: List[str] = ["*"]
+    allowed_origins: List[str] = Field(default=["http://localhost:5173"], env="ALLOWED_ORIGINS")
     rate_limit_per_minute: int = 120
 
     class Config:

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from time import time
 from app.core.config import settings
 from app.utils.logging import configure_logging
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 _rate_limits: dict[str, list[float]] = {}
+_RATE_LIMIT_MAX_KEYS = 10000
 
 
 @app.middleware("http")
@@ -27,9 +29,13 @@ async def rate_limit(request: Request, call_next):
     window = 60
     timestamps = [t for t in _rate_limits.get(identifier, []) if now - t < window]
     if len(timestamps) >= settings.rate_limit_per_minute:
-        raise HTTPException(status_code=429, detail="Rate limit exceeded")
+        return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
     timestamps.append(now)
     _rate_limits[identifier] = timestamps
+    if len(_rate_limits) > _RATE_LIMIT_MAX_KEYS:
+        stale = [k for k, v in _rate_limits.items() if not v or now - v[-1] > window]
+        for k in stale:
+            del _rate_limits[k]
     return await call_next(request)
 
 

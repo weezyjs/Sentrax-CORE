@@ -1,5 +1,6 @@
 import smtplib
 import requests
+from typing import Any
 from email.mime.text import MIMEText
 from app.core.config import settings
 from app.utils.redaction import apply_redaction
@@ -49,11 +50,38 @@ def _apply_overrides(payload: dict, recipients: dict) -> dict[str, dict]:
     }
 
 
+def _build_alert_payload(rule: AlertRule, findings: list[Any]) -> dict:
+    return {
+        "event": "alert",
+        "rule": rule.name,
+        "findings_count": len(findings),
+        "findings": [
+            {
+                "matched_entity": f.matched_entity,
+                "severity": f.severity,
+                "source": f.source,
+                "exposure_types": f.exposure_types,
+            }
+            for f in findings
+        ],
+    }
+
+
+def send_alert(rule: AlertRule, findings: list[Any]) -> None:
+    payload = _build_alert_payload(rule, findings)
+    redacted = apply_redaction(payload, rule.redaction_policy or {})
+    recipients = rule.recipients or {}
+    overrides = _apply_overrides(redacted, recipients)
+    send_email(recipients.get("emails", []), f"DarkWeb Guard Alert: {rule.name}", str(overrides["emails"]))
+    send_sms(recipients.get("phones", []), str(overrides["phones"]))
+    send_webhooks(recipients.get("webhooks", []), overrides["webhooks"])
+
+
 def send_test_alert(rule: AlertRule) -> None:
     sample_payload = {"event": "test_alert", "rule": rule.name, "severity": "medium"}
-    base_redaction = apply_redaction(sample_payload, rule.redaction_policy or {})
+    redacted = apply_redaction(sample_payload, rule.redaction_policy or {})
     recipients = rule.recipients or {}
-    overrides = _apply_overrides(base_redaction, recipients)
+    overrides = _apply_overrides(redacted, recipients)
     send_email(recipients.get("emails", []), "DarkWeb Guard Test Alert", str(overrides["emails"]))
     send_sms(recipients.get("phones", []), str(overrides["phones"]))
     send_webhooks(recipients.get("webhooks", []), overrides["webhooks"])
