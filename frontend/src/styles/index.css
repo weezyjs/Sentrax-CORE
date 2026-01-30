@@ -2,14 +2,137 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 body {
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+.font-mono {
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+/* Card variants */
 .card {
-  @apply bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg;
+  @apply bg-slate-900/80 border border-slate-800 rounded-xl p-6 shadow-lg backdrop-blur-sm;
+}
+.card-hover {
+  @apply card transition-all duration-200 hover:border-slate-700 hover:shadow-glow-sm;
+}
+.card-glow {
+  @apply card border-cyber-700/50 shadow-glow;
 }
 
+/* Badges */
 .badge {
-  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-slate-800 text-accent;
+  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+}
+.badge-high {
+  @apply badge bg-danger-500/15 text-danger-400 border border-danger-500/30;
+}
+.badge-medium {
+  @apply badge bg-warning-500/15 text-warning-400 border border-warning-500/30;
+}
+.badge-low {
+  @apply badge bg-cyber-500/15 text-cyber-300 border border-cyber-500/30;
+}
+.badge-info {
+  @apply badge bg-blue-500/15 text-blue-400 border border-blue-500/30;
+}
+
+/* Status indicators */
+.status-dot {
+  @apply inline-block w-2 h-2 rounded-full;
+}
+.status-online {
+  @apply status-dot bg-success-400;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+}
+.status-warning {
+  @apply status-dot bg-warning-400;
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.6);
+}
+.status-error {
+  @apply status-dot bg-danger-400;
+  box-shadow: 0 0 6px rgba(251, 113, 133, 0.6);
+}
+.status-offline {
+  @apply status-dot bg-slate-600;
+}
+
+/* Buttons */
+.btn {
+  @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950;
+}
+.btn-primary {
+  @apply btn bg-cyber-300 text-slate-950 hover:bg-cyber-200 focus:ring-cyber-400 shadow-glow-sm hover:shadow-glow;
+}
+.btn-secondary {
+  @apply btn bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 focus:ring-slate-500;
+}
+.btn-danger {
+  @apply btn bg-danger-500/15 text-danger-400 border border-danger-500/30 hover:bg-danger-500/25 focus:ring-danger-500;
+}
+.btn-ghost {
+  @apply btn bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50;
+}
+.btn-sm {
+  @apply px-3 py-1.5 text-xs rounded-md;
+}
+
+/* Table styles */
+.table-header {
+  @apply text-xs font-semibold text-slate-400 uppercase tracking-wider;
+}
+.table-row {
+  @apply border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors duration-150;
+}
+
+/* Input styles */
+.input {
+  @apply w-full bg-slate-925 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyber-400 focus:ring-1 focus:ring-cyber-400/30 transition-colors;
+}
+.select {
+  @apply input appearance-none cursor-pointer;
+}
+
+/* Confidence bar */
+.confidence-bar {
+  @apply h-1.5 rounded-full bg-slate-800 overflow-hidden;
+}
+.confidence-fill {
+  @apply h-full rounded-full transition-all duration-500;
+}
+
+/* Threat level ring */
+.threat-ring {
+  @apply relative inline-flex items-center justify-center;
+}
+.threat-ring svg {
+  transform: rotate(-90deg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(77, 225, 193, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77, 225, 193, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
